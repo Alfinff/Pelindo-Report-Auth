@@ -23,9 +23,9 @@ $app = new Laravel\Lumen\Application(
     dirname(__DIR__)
 );
 
-// $app->withFacades();
+$app->withFacades();
 
-// $app->withEloquent();
+$app->withEloquent();
 
 /*
 |--------------------------------------------------------------------------
@@ -59,7 +59,10 @@ $app->singleton(
 |
 */
 
+$app->configure('cors');
 $app->configure('app');
+$app->configure('mail');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -76,9 +79,13 @@ $app->configure('app');
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
 
-// $app->routeMiddleware([
-//     'auth' => App\Http\Middleware\Authenticate::class,
-// ]);
+$app->routeMiddleware([
+	'jwt.auth'        => App\Http\Middleware\JwtMiddleware::class,
+	'role.superadmin' => App\Http\Middleware\SuperAdminMiddleware::class,
+	'role.supervisor'    => App\Http\Middleware\SuperVisorMiddleware::class,
+	'role.eos'  => App\Http\Middleware\EOSMiddleware::class,
+]);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -91,9 +98,24 @@ $app->configure('app');
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
+
+$app->register(Illuminate\Notifications\NotificationServiceProvider::class);
+$app->withFacades(true, [
+    'Illuminate\Support\Facades\Notification' => 'Notification',
+]);
+$app->alias('mailer', \Illuminate\Contracts\Mail\Mailer::class);
+
+// redis
+$app->register(Illuminate\Redis\RedisServiceProvider::class);
+
+// flysystem
+$app->register(GrahamCampbell\Flysystem\FlysystemServiceProvider::class);
+
+// mail
+$app->register(Illuminate\Mail\MailServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
@@ -106,10 +128,21 @@ $app->configure('app');
 |
 */
 
+collect(scandir(__DIR__ . '/../config'))->each(function ($item) use ($app) {
+        $app->configure(basename($item, '.php'));
+});
+
 $app->router->group([
     'namespace' => 'App\Http\Controllers',
 ], function ($router) {
     require __DIR__.'/../routes/web.php';
 });
 
+
+// $app->make('url')->to(env('APP_URL'));
+// $app['url']->to(env('APP_URL'));
+
+//$app->make('url')->forceRootUrl(env('APP_URL', env('APP_URL')));
+
 return $app;
+

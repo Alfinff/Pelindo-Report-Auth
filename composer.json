@@ -6,7 +6,15 @@
     "type": "project",
     "require": {
         "php": "^7.3|^8.0",
-        "laravel/lumen-framework": "^8.0"
+        "firebase/php-jwt": "^5.4",
+        "fruitcake/laravel-cors": "^2.0",
+        "graham-campbell/flysystem": "^7.1",
+        "guzzlehttp/guzzle": "^7.3",
+        "illuminate/notifications": "^8.53",
+        "illuminate/redis": "^8.53",
+        "laravel/lumen-framework": "^8.0",
+        "predis/predis": "^1.1",
+        "ramsey/uuid": "^4.2"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
