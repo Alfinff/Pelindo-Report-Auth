@@ -16,8 +16,8 @@ class UsersSeeder extends Seeder
      */
     public function run()
     {
-        $jumlahSpa      = 5;
-        $jumlahSpv      = 5;
+        $jumlahSpa      = 10;
+        $jumlahSpv      = 10;
         $jumlahEos      = 10;
 
         // buat superadmin

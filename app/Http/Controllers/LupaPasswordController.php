@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use App\Curl\CurlOTPWa;
 use App\Models\User;
@@ -39,8 +40,15 @@ class LupaPasswordController extends Controller
 
             $nama_user = ucwords($user->nama) ?? '';
             $otp = generateRandomString();
+            $msg = $otp." adalah kode verifikasi untuk penggantian password";
 
-            
+            CurlOTPWa::setUrl(env('URL_WOOWA'));
+            CurlOTPWa::setParam([
+                'phone_no' => $no_hp,
+                'key' => env('KEY_WOOWA'),
+                'message' => $msg,
+            ]);
+            CurlOTPWa::requestPost();
 
             $update = $user->update([
                 'otp' => $otp,
@@ -72,7 +80,7 @@ class LupaPasswordController extends Controller
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'User tidak ditemukan',
+                    'message' => 'Data tidak ditemukan',
                     'code'    => 404,
                 ]);
             }
@@ -80,12 +88,13 @@ class LupaPasswordController extends Controller
             $nama_user = ucwords($user->nama) ?? '';
             $otp = generateRandomString();
 
-            CurlOTPWa::setUrl(env('BASE_URL_CHAT') . 'login');
-            CurlOTPWa::setBody([
-                'user'     => $nik,
-                'password' => $phone,
+            CurlOTPWa::setUrl(env('URL_WOOWA'));
+            CurlOTPWa::setParam([
+                'phone_no' => $no_hp,
+                'key' => env('KEY_WOOWA'),
+                'message' => $msg,
             ]);
-
+            CurlOTPWa::requestPost();
 
             $update = $user->update([
                 'otp' => $otp,
@@ -103,144 +112,88 @@ class LupaPasswordController extends Controller
         }
     }
 
-    // public function cekOTP(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'email' => 'required|email',
-    //         'otp'   => 'required|numeric|regex:/^[a-zA-Z0-9]+$/u'
-    //     ]);
+    public function cekOtp()
+    {
+        $this->validate($this->request, [
+            'no_hp' => 'required',
+            'otp' => 'required',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         \Log::error($validator->errors());
-    //         return response()->json([
-    //             'meta' => [
-    //                 'success' => false,
-    //                 'message' => 'Validasi Gagal',
-    //                 'code'    => Response::HTTP_OK,
-    //             ]
-    //         ], Response::HTTP_OK);
-    //     } else {
-    //         $email  = $request->email;
-    //         $otp = $request->otp;
+        try {
+            $no_hp = $this->request->no_hp;
+            $user  = User::where('no_hp', $no_hp)->first();
 
-    //         DB::beginTransaction();
-    //         try {
-    //             $stmt = collect(DB::select("select * from nasabah where email = ? and otp = ? ", [$email, $otp]))->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan',
+                    'code'    => 404,
+                ]);
+            }
 
-    //             if (!$stmt) {
-    //                 return response()->json([
-    //                     'meta' => [
-    //                         'success' => false,
-    //                         'message' => 'OTP Tidak Sesuai',
-    //                         'code'    => Response::HTTP_OK,
-    //                     ]
-    //                 ], Response::HTTP_OK);
-    //             } else {
-    //                 $id   = $stmt->id;
-    //                 $hp   = $stmt->phone;
-    //                 $nama = $stmt->nama;
-    //                 $wa   = $stmt->wa;
-    //                 $nik  = $stmt->nik;
+            if ($user->otp != $this->request->otp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Kode OTP tidak cocok',
+                    'code'    => 404,
+                ]);
+            }
 
-    //                 // DB::update("update nasabah set status='1' where id='$id'");
+            return response()->json([
+                'success' => true,
+                'message' => 'Kode OTP cocok',
+                'code'    => 200,
+            ]);
+        } catch (\Throwable $th) {
+            return writeLog($th->getMessage());
+        }
+    }
 
-    //                 DB::commit();
-    //                 return response()->json([
-    //                     'meta' => [
-    //                         'success' => true,
-    //                         'message' => 'Successfully',
-    //                         'code'    => Response::HTTP_OK,
-    //                     ],
-    //                     'data' => array(
-    //                         'id'     => $id,
-    //                         'nama'   => $nama,
-    //                         'pesan'  => 'OTP sesuai',
-    //                         'topage' => 'setpassword'
-    //                     )
-    //                 ], Response::HTTP_OK);
-    //             }
-    //         } catch (\Throwable $th) {
-    //             DB::rollback();
-    //             return response()->json([
-    //                 'meta' => [
-    //                     'success' => false,
-    //                     // 'message' => $th->getMessage(),
-    //                     'message' => 'Terjadi Kesalahan',
-    //                     'code'    => Response::HTTP_OK,
-    //                 ]
-    //             ], Response::HTTP_OK);
-    //         }
-    //     }
-    // }
+    public function ubahSandi()
+    {
+        $this->validate($this->request, [
+            'no_hp' => 'required',
+            'password' => 'required|confirmed',
+        ]);
 
-    // public function setPassword(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'email'    => 'required|email',
-    //         'newpassword' => 'required'
-    //     ]);
+        DB::beginTransaction();
+        try {
+            $no_hp = $this->request->no_hp;
+            $user  = User::where('no_hp', $no_hp)->first();
 
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'meta' => [
-    //                 'success' => false,
-    //                 'message' => 'Validasi Gagal',
-    //                 'code'    => Response::HTTP_OK,
-    //             ]
-    //         ], Response::HTTP_OK);
-    //     } else {
-    //         $email = $request->email;
-    //         $newpassword = Fungsi::encrypt($request->newpassword);
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Data tidak ditemukan',
+                    'code'    => 404,
+                ]);
+            }
 
-    //         DB::beginTransaction();
-    //         try {
-    //             $stmt = collect(DB::select("select * from nasabah where email = ?", [$email]))->first();
+            if ((int)$user->reset_pswd_count > 5) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengubahan Password Sudah Melebihi Limit',
+                    'code'    => 505,
+                ]);
+            }
 
-    //             if (!$stmt) {
-    //                 return response()->json([
-    //                     'meta' => [
-    //                         'success' => false,
-    //                         'message' => 'Data Tidak Ditemukan',
-    //                         'code'    => Response::HTTP_OK,
-    //                     ]
-    //                 ], Response::HTTP_OK);
-    //             } else {
-    //                 $id    = $stmt->id;
-    //                 $email = $stmt->email;
-    //                 $nama  = $stmt->nama;
-    //                 $wa    = $stmt->wa;
+            $count = (int)$user->reset_pswd_count+1;
+            $user->update([
+                'password' => Hash::make($this->request->password),
+                'reset_pswd_count' => $count,
+                'reset_pswd_at' => date('Y-m-d H:i:s')
+            ]);
 
-    //                 DB::update("update nasabah set pass = ? where id = ? ", [$newpassword, $id]);
-    //                 // $pesan = 'Yth. ' . $nama . ', ' . $pin . ' adalah pin transaksi '.env('NamaBUMDesa');
-    //                 // DB::connection('primakom')->insert("insert into outbox (nohp,pesan) values('$hp','$pesan')");
-    //                 // DB::connection('primakom')->insert("insert into pesanwa (nohp,pesan1,pesan2,namafile,caption,respon,status) values('$wa','$pesan','','','','','0')");
-
-    //                 DB::commit();
-    //                 return response()->json([
-    //                     'meta' => [
-    //                         'success' => true,
-    //                         'message' => 'Successfully',
-    //                         'code'    => Response::HTTP_OK,
-    //                     ],
-    //                     'data' => array(
-    //                         'id'     => $id,
-    //                         'email'  => $email,
-    //                         'pesan'  => 'Penggantian Password Berhasil',
-    //                         'topage' => 'login'
-    //                     ),
-    //                 ], Response::HTTP_OK);
-    //             }
-    //         } catch (\Throwable $th) {
-    //             DB::rollback();
-    //             return response()->json([
-    //                 'meta' => [
-    //                     'success' => false,
-    //                     // 'message' => $th->getMessage(),
-    //                     'message' => 'Terjadi Kesalahan',
-    //                     'code'    => Response::HTTP_OK,
-    //                 ]
-    //             ], Response::HTTP_OK);
-    //         }
-    //     }
-    // }
+            DB::commit();
+            return response()->json([
+                'success' => true,
+                'message' => 'Berhasil ubah password',
+                'code'    => 200,
+            ]);
+        } catch (\Throwable $th) {
+            DB::rollback();
+            return writeLog($th->getMessage());
+        }
+    }
+    
 }

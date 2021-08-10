@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Role extends Model
+class JenisKelamin extends Model
 {
     use HasFactory;
 
@@ -21,12 +21,11 @@ class Role extends Model
 
     protected $fillable = [
         'uuid',
-        'kode',
         'nama'
     ];
 
     protected $connection = 'pelindo_repport';
-    protected $table      = 'ms_roles';
+    protected $table      = 'ms_jenis_kelamin';
     protected $guarded    = [];
 
     public function getCreatedAtAttribute($value)

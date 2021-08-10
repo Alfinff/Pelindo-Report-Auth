@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Http;
 
 class CurlOTPWa
 {
-	protected static $url, $param, $body, $token, $userId;
+	protected static $url, $param;
 
 	public static function setUrl($url)
 	{
@@ -18,26 +18,9 @@ class CurlOTPWa
 		self::$param = $param;
 	}
 
-	public static function setBody($body)
-	{
-		self::$body = $body;
-	}
-
-	public static function setToken($token)
-	{
-		self::$token = $token;
-	}
-
-	public static function setUserId($userId)
-	{
-		self::$userId = $userId;
-	}
-
 	public static function requestGet()
 	{
 		$response = Http::withHeaders([
-			'X-Auth-Token' => self::$token,
-			'X-User-Id'    => self::$userId,
 			'Content-Type' => 'application/json',
 		])->get(self::$url);
 
@@ -47,10 +30,8 @@ class CurlOTPWa
 	public static function requestPost()
 	{
 		$response = Http::withHeaders([
-			'X-Auth-Token' => self::$token,
-			'X-User-Id'    => self::$userId,
 			'accept'       => 'application/json',
-		])->post(self::$url, self::$body);
+		])->post(self::$url, self::$param);
 
 		return $response;
 	}

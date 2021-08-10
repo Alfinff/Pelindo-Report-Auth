@@ -29,7 +29,9 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'key',
         'otp',
         'email',
-        'no_hp'
+        'no_hp',
+        'reset_pswd_count',
+        'reset_pswd_at'
     ];
 
     protected $connection = 'pelindo_repport';
@@ -38,7 +40,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
 
     public function role()
     {
-        return $this->hasOne(Role::class, 'code', 'role');
+        return $this->hasOne(Role::class, 'kode', 'role');
     }
 
     public function profile()

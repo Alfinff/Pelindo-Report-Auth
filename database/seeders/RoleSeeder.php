@@ -16,20 +16,20 @@ class RoleSeeder extends Seeder
     public function run()
     {
         $SPA = Role::create([
-            'code' => env('ROLE_SPA'),
-            'name' => 'Super Admin',
+            'kode' => env('ROLE_SPA'),
+            'nama' => 'Super Admin',
             'uuid' => generateUuid(),
         ]);
 
         $SPV = Role::create([
-            'code' => env('ROLE_SPV'),
-            'name' => 'Super Visor',
+            'kode' => env('ROLE_SPV'),
+            'nama' => 'Super Visor',
             'uuid' => generateUuid(),
         ]);
 
         $EOS = Role::create([
-            'code' => env('ROLE_EOS'),
-            'name' => 'Engineer On Site',
+            'kode' => env('ROLE_EOS'),
+            'nama' => 'Engineer On Site',
             'uuid' => generateUuid(),
         ]);
 

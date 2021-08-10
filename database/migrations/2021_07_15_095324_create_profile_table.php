@@ -17,7 +17,7 @@ class CreateProfileTable extends Migration
             $table->id();
             $table->string('foto')->nullable();
             $table->date('tgllahir')->nullable();
-            $table->string('jenis_kelamin')->default('LAKI-LAKI')->nullable();
+            $table->string('jenis_kelamin')->nullable();
             $table->string('alamat')->nullable();
             $table->string('user_id', 191);
             $table->string('uuid', 191)->unique();
