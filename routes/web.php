@@ -14,19 +14,20 @@
 */
 
 $router->get('/', function () use ($router) {
-    echo 'API PELINDO REPPORT';
+    echo 'API Pelindo Report - Auth & Profil';
 });
 
-$router->post('/auth/login', 'AuthController@authenticate');
+$router->get('/', function () use ($router) {
+    echo 'API Pelindo Report - Auth & Profil';
+});
 
-$router->group(['middleware' => 'jwt.auth'], function () use ($router) {
-    $router->get('/cek-status-login', function () {
-        return response()->json([
-            'success' => true,
-            'message' => 'User login',
-            'code'    => 200,
-        ]);
-    });
+$router->post('/login', 'AuthController@authenticate');
+
+$router->group(['prefix' => 'lupapassword'], function() use ($router) {
+    $router->post('/kirimnohp', 'LupaPasswordController@kirimNoHp');
+    $router->post('/kirimulangotp', 'LupaPasswordController@kirimOtp');
+    $router->post('/otp', 'LupaPasswordController@cekOtp');
+    $router->post('/setpassword', 'LupaPasswordController@setPassword');
 });
 
 $router->group(['prefix' => 'superadmin', 'middleware' => ['jwt.auth', 'role.superadmin']], function() use ($router) {

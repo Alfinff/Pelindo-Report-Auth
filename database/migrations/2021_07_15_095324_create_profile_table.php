@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateRolesTable extends Migration
+class CreateProfileTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,14 @@ class CreateRolesTable extends Migration
      */
     public function up()
     {
-        Schema::create('ms_roles', function (Blueprint $table) {
+        Schema::create('ms_profile', function (Blueprint $table) {
             $table->id();
+            $table->string('foto')->nullable();
+            $table->date('tgllahir')->nullable();
+            $table->string('jenis_kelamin')->default('LAKI-LAKI')->nullable();
+            $table->string('alamat')->nullable();
+            $table->string('user_id', 191);
             $table->string('uuid', 191)->unique();
-            $table->string('code')->unique();
-            $table->string('name');
             $table->timestamps();
         });
     }
@@ -29,6 +32,6 @@ class CreateRolesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('ms_roles');
+        Schema::dropIfExists('ms_profile');
     }
 }

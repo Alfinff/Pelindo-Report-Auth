@@ -10,12 +10,16 @@ use Illuminate\Support\Facades\Http;
 
 function writeLog($message)
 {
-	\Log::error($message);
-	return response()->json([
-		'success' => false,
-		'message' => env('APP_DEBUG') ? $message : 'Terjadi kesalahan',
-		'code'    => 500,
-	]);
+	try {
+		\Log::error($message);
+		return response()->json([
+			'success' => false,
+			'message' => env('APP_DEBUG') ? $message : 'Terjadi kesalahan',
+			'code'    => 500,
+		]);
+	} catch (Exception $e) {
+		return false;
+	}
 }
 
 function generateUuid()
@@ -32,44 +36,25 @@ function generateJwt(User $user)
 	try {
 	    $key  = str_shuffle('QWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%^&*()_={}|:"<>?[]\;');
 
-		if($user->role == env('ROLE_MHS')) {
-			$dataUser = [
-				'id'               => $user->id,
-				'uuid'             => $user->uuid,
-				'role'             => $user->role,
-				'username'         => $user->username,
-				'mahasiswa'        => [
-					'uuid'             => $user->mahasiswa->uuid,
-					'user_id'          => $user->mahasiswa->user_id,
-					'nama'             => $user->mahasiswa->nama,
-					'nim'              => $user->mahasiswa->nim,
-					'alamat'           => $user->mahasiswa->alamat,
-					'gugus_id'         => $user->mahasiswa->gugus_id,
-					'prodi_id'         => $user->mahasiswa->prodi_id,
-					'tgllahir'         => $user->mahasiswa->tgllahir,
-					'nohp'             => $user->mahasiswa->nohp,
-					'notif_email'      => $user->mahasiswa->notif_email,
-					'face_recognition' => $user->mahasiswa->face_recognition,
-					'email'            => $user->mahasiswa->email,
-					'foto'             => $user->mahasiswa->foto,
-				],
-				'gugus'            => [
-					'uuid'       => $user->mahasiswa->gugus->uuid,
-					'nama'       => $user->mahasiswa->gugus->name,
-					'pemandu_id' => $user->mahasiswa->gugus->pemandu_id,
-				],
-				'prodi' => [
-					'uuid' => $user->mahasiswa->prodi->uuid,
-					'nama' => $user->mahasiswa->prodi->nama,
-					'kode' => $user->mahasiswa->prodi->kode,
-				],
-			];
-		} else {
-			$dataUser = [
-				'id'       => $user->id,
-				'uuid'     => $user->uuid,
-				'role'     => $user->role,
-				'username' => $user->username,
+		$dataUser = [
+			'id'           	=> $user->id,
+			'uuid'          => $user->uuid,
+			'nama'          => $user->nama,
+			'role'          => $user->role,
+			'email'         => $user->email,
+			'no_hp'         => $user->no_hp,
+			'fcm_token'     => $user->fcm_token,
+			'profile'       => ''
+		];
+
+		if($user->profile) {
+			$dataUser['profile'] = [
+				'uuid'             => $user->profile->uuid ?? '',
+				'foto'             => $user->profile->foto ?? '',
+				'tgllahir'         => $user->profile->tgllahir ?? '',
+				'jenis_kelamin'    => $user->profile->jenis_kelamin ?? '',
+				'alamat'           => $user->profile->alamat ?? '',
+				'user_id'          => $user->profile->user_id ?? '',
 			];
 		}
 
@@ -91,7 +76,7 @@ function generateJwt(User $user)
 
 	    return JWT::encode($payload, env('JWT_SECRET'));
 	} catch (Exception $e) {
-		return false;
+		return response()->json(array('msg' => $e->getMessage(), 'success' => false));
 	}
 }
 
@@ -128,4 +113,8 @@ function sendFcm($to, $notification, $data)
 	]);
 
 	return $response;
+}
+
+function generateRandomString($length = 6) {
+	return substr(str_shuffle(str_repeat($x = '1234567890', ceil($length / strlen($x)))), 1, $length);
 }

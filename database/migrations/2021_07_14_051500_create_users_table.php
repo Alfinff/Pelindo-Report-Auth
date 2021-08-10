@@ -13,16 +13,19 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('ms_users', function (Blueprint $table) {
             $table->id();
             $table->string('uuid', 191)->unique();
+            $table->string('nama')->nullable();
+            $table->string('no_hp')->unique();;
             $table->string('email')->unique();
-            $table->string('role', 191);
-            $table->string('username');
             $table->string('password');
+            $table->string('role', 191);
             $table->string('key')->nullable();
             $table->string('otp')->nullable();
             $table->text('fcm_token')->nullable();
+            $table->integer('reset_pswd_count')->length(2)->nullable();
+            $table->date('reset_pswd_at')->nullable();
             $table->timestamps();
         });
     }
@@ -34,6 +37,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('ms_users');
     }
 }
