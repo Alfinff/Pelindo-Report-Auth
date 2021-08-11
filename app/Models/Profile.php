@@ -41,4 +41,15 @@ class Profile extends Model
         return $value;
     }
 
+    public function getCreatedAtAttribute($value)
+    {
+        return formatTanggal($value);
+    }
+
+    public function getUpdatedAtAttribute($value)
+    {
+        return formatTanggal($value);
+    }
+
+
 }
