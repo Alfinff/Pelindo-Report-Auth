@@ -30,7 +30,7 @@ class ProfileController extends Controller
         try {
             $decodeToken = parseJwt($this->request->header('Authorization'));
             $uuid = $decodeToken->user->uuid;
-            $user = Profile::where('user_id', $uuid)->first();
+            $user = Profile::with('user', 'user.role')->where('user_id', $uuid)->first();
 
             if (!$user) {
                 return response()->json([
@@ -74,7 +74,6 @@ class ProfileController extends Controller
                 ]);
             }
 
-            
             $pathfoto = $user->foto;
             if ($this->request->foto) {
                 $foto     = base64_decode($this->request->foto);
@@ -89,7 +88,7 @@ class ProfileController extends Controller
                 'foto'   => $pathfoto,
             ]);
 
-            $user = User::with('profile')->where('uuid', $uuid)->first();
+            $user = User::with('profile', 'role')->where('uuid', $uuid)->first();
             $aksesToken = generateJwt($user);
 
             DB::commit();

@@ -30,6 +30,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
         'otp',
         'email',
         'no_hp',
+        'fcm_token',
         'reset_pswd_count',
         'reset_pswd_at'
     ];

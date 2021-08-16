@@ -23,19 +23,19 @@ class AuthController extends Controller
 
         try {
 
-            $user = User::with('profile')->where('email', $this->request->email)->first();
+            $user = User::with('profile', 'role')->where('email', $this->request->email)->first();
 
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Data tidak ditemukan',
+                    'message' => 'Email Belum Terdaftar',
                     'code'    => 404,
                 ]);
             }
 
-            if ($this->request->fcm_token) {
+            if ($this->request->token) {
                 $user->update([
-                    'fcm_token' => $this->request->fcm_token,
+                    'fcm_token' => $this->request->token,
                 ]);
             }
 
@@ -59,7 +59,7 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Data tidak ditemukan',
+                'message' => 'Email Atau Password Salah',
                 'code'    => 404,
             ]);
         } catch (\Throwable $th) {

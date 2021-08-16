@@ -21,14 +21,7 @@ class JwtMiddleware
             if ($request->header('Authorization')) {
                 $decode = parseJwt($request->header('Authorization'));
 
-                // redis
-                $cacheUser = app('redis')->get('user_' . $decode->user->uuid);
-
-                if (!$cacheUser) {
-                    $user = User::find($decode->user->id);
-                } else {
-                    $user = json_decode($cacheUser);
-                }
+                $user = User::find($decode->user->id);
 
                 if ($decode->key == $user->key) {
                     return $next($request);

@@ -78,6 +78,9 @@ $app->configure('mail');
 // $app->middleware([
 //     App\Http\Middleware\ExampleMiddleware::class
 // ]);
+$app->middleware([
+    App\Http\Middleware\CorsMiddleware::class
+]);
 
 $app->routeMiddleware([
 	'jwt.auth'        => App\Http\Middleware\JwtMiddleware::class,
@@ -98,9 +101,9 @@ $app->routeMiddleware([
 |
 */
 
-$app->register(App\Providers\AppServiceProvider::class);
-$app->register(App\Providers\AuthServiceProvider::class);
-$app->register(App\Providers\EventServiceProvider::class);
+// $app->register(App\Providers\AppServiceProvider::class);
+// $app->register(App\Providers\AuthServiceProvider::class);
+// $app->register(App\Providers\EventServiceProvider::class);
 
 $app->register(Illuminate\Notifications\NotificationServiceProvider::class);
 $app->withFacades(true, [

@@ -19,6 +19,19 @@ $router->get('/', function () use ($router) {
 
 $router->post('/login', 'AuthController@authenticate');
 
+$router->group(['middleware' => ['jwt.auth']], function() use ($router) {
+    $router->get('/cek-status-login', function () {
+        return response()->json([
+            'success' => true,
+            'message' => 'User login',
+            'code'    => 200,
+        ]);
+    });
+
+    $router->get('/decodetoken', 'AuthController@decodetoken');
+});
+
+
 $router->group(['prefix' => 'lupapassword'], function() use ($router) {
     $router->post('/kirimnohp', 'LupaPasswordController@kirimNoHp');
     $router->post('/kirimulangotp', 'LupaPasswordController@kirimOtp');
