@@ -61,7 +61,7 @@ function generateJwt(User $user)
 	    $payload = [
 			'iss'  => 'lumen-jwt',
 			'iat'  => time(),
-			'exp'  => time() + 60 * 60,
+			'exp'  => time() + 60 * 60 * 3,
 			'key'  => $key,
 			'user' => $dataUser,
 	    ];
