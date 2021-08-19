@@ -22,6 +22,20 @@ function writeLog($message)
 	}
 }
 
+function writeLogValidation($message)
+{
+	try {
+		\Log::error($message);
+		return response()->json([
+            'success' => false,
+            'message' => 'Validasi gagal',
+            'code'    => 422,
+        ]);
+	} catch (Exception $e) {
+		return false;
+	}
+}
+
 function generateUuid()
 {
 	try {

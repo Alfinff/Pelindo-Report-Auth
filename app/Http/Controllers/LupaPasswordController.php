@@ -20,9 +20,14 @@ class LupaPasswordController extends Controller
 
     public function kirimNoHp(Request $request)
     {
-        $this->validate($this->request, [
+
+        $validator = Validator::make($this->request->all(), [
             'no_hp' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return writeLogValidation($validator->errors());
+        }
 
         DB::beginTransaction();
         try {        
@@ -68,9 +73,14 @@ class LupaPasswordController extends Controller
 
     public function kirimUlangOTP(Request $request)
     {
-        $this->validate($this->request, [
+
+        $validator = Validator::make($this->request->all(), [
             'no_hp' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return writeLogValidation($validator->errors());
+        }
 
         DB::beginTransaction();
         try {
@@ -114,10 +124,15 @@ class LupaPasswordController extends Controller
 
     public function cekOtp()
     {
-        $this->validate($this->request, [
+
+        $validator = Validator::make($this->request->all(), [
             'no_hp' => 'required',
             'otp' => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return writeLogValidation($validator->errors());
+        }
 
         try {
             $no_hp = $this->request->no_hp;
@@ -151,10 +166,15 @@ class LupaPasswordController extends Controller
 
     public function ubahSandi()
     {
-        $this->validate($this->request, [
+
+        $validator = Validator::make($this->request->all(), [
             'no_hp' => 'required',
             'password' => 'required|confirmed',
         ]);
+
+        if ($validator->fails()) {
+            return writeLogValidation($validator->errors());
+        }
 
         DB::beginTransaction();
         try {

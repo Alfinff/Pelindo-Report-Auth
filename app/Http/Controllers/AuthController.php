@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -14,12 +15,17 @@ class AuthController extends Controller
         $this->request = $request;
     }
 
-    public function authenticate(User $user) {
-        
-        $this->validate($this->request, [
+    public function authenticate(User $user) 
+    {
+
+        $validator = Validator::make($this->request->all(), [
             'email' => 'required',
             'password' => 'required'
         ]);
+
+        if ($validator->fails()) {
+            return writeLogValidation($validator->errors());
+        }
 
         try {
 
