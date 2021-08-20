@@ -28,16 +28,20 @@ class AuthController extends Controller
         }
 
         try {
-            $user = User::with('profile', 'role')->whereHas('role', function ($query) {
-                $query->where('kode', env('ROLE_SPA'));
-            })->orwhereHas('role', function ($query) {
-                $query->where('kode', env('ROLE_SPV'));
-            })->where('email', $this->request->email)->first();
+            $user = User::with('profile', 'role')->where('email', $this->request->email)->first();
 
             if (!$user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Email Belum Terdaftar',
+                    'message' => 'Pengguna belum terdaftar',
+                    'code'    => 404,
+                ]);
+            }
+
+            if(!($user->role == env('ROLE_SPV')) && !($user->role == env('ROLE_SPA'))) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengguna belum terdaftar',
                     'code'    => 404,
                 ]);
             }
