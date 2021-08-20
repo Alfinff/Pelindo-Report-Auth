@@ -18,6 +18,7 @@ $router->get('/', function () use ($router) {
 });
 
 $router->post('/login', 'AuthController@authenticate');
+$router->post('/login/mobile', 'AuthController@authMobile');
 
 $router->group(['middleware' => ['jwt.auth']], function() use ($router) {
     $router->get('/cek-status-login', function () {
