@@ -54,6 +54,8 @@ class ProfileController extends Controller
     public function update()
     {
         $this->validate($this->request, [
+            'nama' => 'required',
+            'no_hp' => 'required',
             'tgllahir' => 'required',
             'jenis_kelamin' => 'required',
             'alamat' => 'required',
@@ -64,8 +66,31 @@ class ProfileController extends Controller
         try {
             $decodeToken = parseJwt($this->request->header('Authorization'));
             $uuid        = $decodeToken->user->uuid;
-            $user   = Profile::where('user_id', $uuid)->first();
+            $user   = User::where('uuid', $uuid)->first();
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Pengguna tidak ditemukan',
+                    'code'    => 404,
+                ]);
+            }
 
+            $ceknohp   = User::where('no_hp', $this->request->no_hp)->whereNotIn('uuid', [$uuid])->first();
+            if ($ceknohp) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Nomor hp tersebut sudah digunakan, silahkan gunakan nomor lain',
+                    'code'    => 404,
+                ]);
+            }
+
+            $user->update([
+                'nama' => $this->request->nama,
+                'no_hp' => $this->request->no_hp,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            $user   = Profile::where('user_id', $uuid)->first();
             if (!$user) {
                 return response()->json([
                     'success' => false,
