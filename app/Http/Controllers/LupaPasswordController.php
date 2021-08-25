@@ -146,6 +146,7 @@ class LupaPasswordController extends Controller
                 ]);
             }
 
+
             if ($user->otp != $this->request->otp) {
                 return response()->json([
                     'success' => false,

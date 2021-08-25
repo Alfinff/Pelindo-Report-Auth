@@ -7,6 +7,7 @@ use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use GrahamCampbell\Flysystem\Facades\Flysystem;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendOtp;
 use Illuminate\Support\Facades\Hash;
@@ -51,16 +52,22 @@ class ProfileController extends Controller
         }
     }
 
-    public function update()
+    public function update(Request $request)
     {
-        $this->validate($this->request, [
+
+        // jangan pakai $this->validate
+        $validator = Validator::make($this->request->all(), [
             'nama' => 'required',
             'no_hp' => 'required',
-            'tgllahir' => 'required',
-            'jenis_kelamin' => 'required',
+            // 'tgllahir' => 'required',
+            // 'jenis_kelamin' => 'required',
             'alamat' => 'required',
             // 'foto'   => 'required',
         ]);
+
+        if ($validator->fails()) {
+            return writeLogValidation($validator->errors());
+        }
 
         DB::beginTransaction();
         try {
@@ -107,8 +114,8 @@ class ProfileController extends Controller
             } 
 
             $user->update([
-                'tgllahir' => date('Y-m-d', strtotime($this->request->tgllahir)),
-                'jenis_kelamin' => $this->request->jenis_kelamin,
+                // 'tgllahir' => date('Y-m-d', strtotime($this->request->tgllahir)),
+                // 'jenis_kelamin' => $this->request->jenis_kelamin,
                 'alamat' => $this->request->alamat,
                 'foto'   => $pathfoto,
             ]);
