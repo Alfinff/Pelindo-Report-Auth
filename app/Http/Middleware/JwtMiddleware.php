@@ -34,7 +34,7 @@ class JwtMiddleware
                 'code'    => 401,
             ]);
         } catch (\Throwable $th) {
-            writeLog($th->getMessage());
+            return writeLog($th->getMessage());
 
             return response()->json([
                 'success' => false,

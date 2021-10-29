@@ -90,45 +90,69 @@ function generateJwt(User $user)
 
 	    return JWT::encode($payload, env('JWT_SECRET'));
 	} catch (Exception $e) {
-		return response()->json(array('msg' => $e->getMessage(), 'success' => false));
+		return writeLog($e->getMessage());
 	}
 }
 
 function parseJwt($token)
 {
-	return JWT::decode($token, env('JWT_SECRET'), array('HS256'));
+	try {
+		return JWT::decode($token, env('JWT_SECRET'), array('HS256'));
+	} catch (Exception $e) {
+		return writeLog($e->getMessage());
+	}
 }
 
 function uploadFileS3($base64, $path)
 {
-	$file = base64_decode($base64);
-	Flysystem::connection('awss3')->put($path, $file);
+	try {
+		$file = base64_decode($base64);
+		Flysystem::connection('awss3')->put($path, $file);
+	} catch (Exception $e) {
+		return writeLog($e->getMessage());
+	}
 }
 
 function generateOtp()
 {
-	return substr(str_shuffle('1234567890'), 0, 6);
+	try {
+		return substr(str_shuffle('1234567890'), 0, 6);
+	} catch (Exception $e) {
+		return writeLog($e->getMessage());
+	}
 }
 
 function formatTanggal($tanggal)
 {
-	return date('Y-m-d H:i:s', strtotime($tanggal));
+	try {
+		return date('Y-m-d H:i:s', strtotime($tanggal));
+	} catch (Exception $e) {
+		return writeLog($e->getMessage());
+	}
 }
 
 function sendFcm($to, $notification, $data)
 {
-	$response = Http::withHeaders([
-		'Authorization' => 'key=' . env('KEY_FCM'),
-		'Content-Type'  => 'application/json',
-	])->post(env('URL_FCM'), [
-		'to'           => $to,
-		'notification' => $notification,
-		'data'         => $data,
-	]);
+	try {
+		$response = Http::withHeaders([
+			'Authorization' => 'key=' . env('KEY_FCM'),
+			'Content-Type'  => 'application/json',
+		])->post(env('URL_FCM'), [
+			'to'           => $to,
+			'notification' => $notification,
+			'data'         => $data,
+		]);
 
-	return $response;
+		return $response;
+	} catch (Exception $e) {
+		return writeLog($e->getMessage());
+	}
 }
 
 function generateRandomString($length = 6) {
-	return substr(str_shuffle(str_repeat($x = '1234567890', ceil($length / strlen($x)))), 1, $length);
+	try {
+		return substr(str_shuffle(str_repeat($x = '1234567890', ceil($length / strlen($x)))), 1, $length);
+	} catch (Exception $e) {
+		return writeLog($e->getMessage());
+	}
 }

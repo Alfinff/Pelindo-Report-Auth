@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
+
 /** @var \Laravel\Lumen\Routing\Router $router */
 
 /*
@@ -15,6 +17,15 @@
 
 $router->get('/', function () use ($router) {
     echo 'API Pelindo Report - Auth & Profil';
+});
+
+$router->get('/tesdb', function () use ($router) {
+    // Test database connection
+    try {
+        DB::connection()->getPdo();
+    } catch (\Exception $e) {
+        die("Could not connect to the database.  Please check your configuration. error:" . $e );
+    }
 });
 
 $router->post('/login', 'AuthController@authenticate');

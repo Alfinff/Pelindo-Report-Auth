@@ -143,6 +143,7 @@ $app->router->group([
 // $app['url']->to(env('APP_URL'));
 
 //$app->make('url')->forceRootUrl(env('APP_URL', env('APP_URL')));
+$app->make('url')->forceRootUrl(env('APP_URL', 'https://centro.pelindo.co.id/api/auth/'));
 
 return $app;
 
