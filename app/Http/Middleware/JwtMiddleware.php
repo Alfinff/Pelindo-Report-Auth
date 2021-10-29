@@ -35,12 +35,6 @@ class JwtMiddleware
             ]);
         } catch (\Throwable $th) {
             return writeLog($th->getMessage());
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Unauthorize',
-                'code'    => 401,
-            ]);
         }
     }
 }

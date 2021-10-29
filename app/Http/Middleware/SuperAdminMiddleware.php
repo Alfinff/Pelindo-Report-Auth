@@ -15,12 +15,16 @@ class SuperAdminMiddleware
      */
     public function handle($request, Closure $next, $guard = null)
     {
-        $decodeToken = parseJwt($request->header('Authorization'));
+        try {
+            $decodeToken = parseJwt($request->header('Authorization'));
 
-        if ($decodeToken->user->role == env('ROLE_SPA')) {
-            return $next($request);
+            if ($decodeToken->user->role == env('ROLE_SPA')) {
+                return $next($request);
+            }
+
+            return writeLog('Unauthorize');
+        } catch (\Throwable $th) {
+            return writeLog($th->getMessage());
         }
-
-        return writeLog('Unauthorize');
     }
 }
