@@ -34,7 +34,7 @@ class JwtMiddleware
                 'code'    => 401,
             ]);
         } catch (\Throwable $th) {
-            return writeLog($th->getMessage());
+            return writeLog($decode->original->message ?? 'Expired Token.');
         }
     }
 }

@@ -145,7 +145,7 @@ class AuthController extends Controller
         try {
             $decodeToken = parseJwt($this->request->header('Authorization'));
 
-            return json_encode($decodeToken);
+            return json_encode($decodeToken->user);
         } catch (\Throwable $th) {
             return writeLog($th->getMessage());
         }

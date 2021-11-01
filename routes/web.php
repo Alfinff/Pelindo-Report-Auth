@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
 
 /** @var \Laravel\Lumen\Routing\Router $router */
 
@@ -22,7 +23,21 @@ $router->get('/', function () use ($router) {
 $router->get('/tesdb', function () use ($router) {
     // Test database connection
     try {
-        DB::connection()->getPdo();
+        // DB::connection()->getPdo();
+        if(DB::connection()->getDatabaseName())
+        {
+            echo "conncted sucessfully to database ".DB::connection()->getDatabaseName();
+        } else {
+            echo 'no';
+        }
+    } catch (\Exception $e) {
+        die("Could not connect to the database.  Please check your configuration. error:" . $e );
+    }
+});
+
+$router->get('/token', function () use ($router) {
+    try {
+        // return $request->header('Authorization');
     } catch (\Exception $e) {
         die("Could not connect to the database.  Please check your configuration. error:" . $e );
     }

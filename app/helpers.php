@@ -1,5 +1,6 @@
 <?php
 
+\Firebase\JWT\JWT::$leeway = 10;
 use Firebase\JWT\ExpiredException;
 use Firebase\JWT\JWT;
 use Ramsey\Uuid\Uuid;
@@ -48,16 +49,18 @@ function generateUuid()
 function generateJwt(User $user)
 {
 	try {
-	    $key  = str_shuffle('QWERTYUIOPASDFGHJKLZXCVBNM1234567890!@#$%^&*()_={}|:"<>?[]\;');
+		$key = '';
+	    $key  = str_shuffle('QWERTYUIOPASDFGHJKLZXCVBNM1234567890');
 
+		$dataUser = [];
 		$dataUser = [
-			'id'           	=> $user->id,
-			'uuid'          => $user->uuid,
-			'nama'          => $user->nama,
-			'role'          => $user->role,
-			'email'         => $user->email,
-			'no_hp'         => $user->no_hp,
-			'fcm_token'     => $user->fcm_token,
+			'id'           	=> $user->id ?? '',
+			'uuid'          => $user->uuid ?? '',
+			'nama'          => $user->nama ?? '',
+			'role'          => $user->role ?? '',
+			'email'         => $user->email ?? '',
+			'no_hp'         => $user->no_hp ?? '',
+			'fcm_token'     => $user->fcm_token ?? '',
 			'profile'       => ''
 		];
 
@@ -72,6 +75,7 @@ function generateJwt(User $user)
 			];
 		}
 
+		$payload = [];
 	    $payload = [
 			'iss'  => 'lumen-jwt',
 			'iat'  => time(),
@@ -84,9 +88,11 @@ function generateJwt(User $user)
 	    $user = User::find($user->id);
 
 	    // update key
-	    $user->update([
-	        'key' => $key,
-	    ]);
+		if($user) {
+			$user->update([
+				'key' => $key,
+			]);
+		}
 
 	    return JWT::encode($payload, env('JWT_SECRET'));
 	} catch (Exception $e) {
