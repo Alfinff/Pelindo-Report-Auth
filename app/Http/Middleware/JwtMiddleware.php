@@ -23,8 +23,10 @@ class JwtMiddleware
 
                 $user = User::find($decode->user->id);
 
-                if ($decode->key == $user->key) {
-                    return $next($request);
+                if($user) {
+                    if ($decode->key == $user->key) {
+                        return $next($request);
+                    }
                 }
             }
 
