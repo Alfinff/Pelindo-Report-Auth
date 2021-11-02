@@ -106,7 +106,7 @@ class ProfileController extends Controller
                 ]);
             }
 
-            $pathfoto = $user->foto;
+            $pathfoto = $user->namafotoasli;
             if ($this->request->foto) {
                 $foto     = base64_decode($this->request->foto);
                 $pathfoto = 'profile/foto/'. $uuid.'.png';

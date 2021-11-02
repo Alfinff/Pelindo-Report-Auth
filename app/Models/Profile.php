@@ -30,6 +30,11 @@ class Profile extends Model
         return $this->belongsTo(User::class, 'user_id', 'uuid');
     }
 
+    public function getNamaFotoAsliAttribute()
+    {
+        return $this->attributes['foto'];
+    }
+
     public function getFotoAttribute($value)
     {
         if ($value == '') {
