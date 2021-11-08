@@ -38,13 +38,13 @@ class AuthController extends Controller
                 ]);
             }
 
-            if(!($user->role == env('ROLE_SPV')) && !($user->role == env('ROLE_SPA'))) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Pengguna belum terdaftar',
-                    'code'    => 404,
-                ]);
-            }
+            // if(!($user->role == env('ROLE_SPV')) && !($user->role == env('ROLE_SPA'))) {
+            //     return response()->json([
+            //         'success' => false,
+            //         'message' => 'Pengguna belum terdaftar',
+            //         'code'    => 404,
+            //     ]);
+            // }
 
             if ($this->request->token) {
                 $user->update([
