@@ -44,7 +44,8 @@ return [
 
         's3' => [
             'driver' => 's3',
-            'endpoint' => env('AWS_ENDPOINT_SECOND'),
+            // 'endpoint' => env('AWS_ENDPOINT_SECOND'),
+            'endpoint' => 'https://s3.smartmanagement.id/',
             'use_path_style_endpoint' => true,
             'credentials' => [
                 'key' => env('AWS_ACCESS_KEY'),
